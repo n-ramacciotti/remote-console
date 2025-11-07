@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remote Console GUI</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="api.js" defer></script>
+</head>
+<body>
+    <h1>Remote console GUI</h1>
+    <p>This is a remote console connected to <strong>SVSM</strong>.</p>
+    <p>Connection status: <span id="status_indicator" class="dot red"></span></p>
+
+    <div id="container">
+
+        <div class="row">
+            <button id="button_log">Get Log</button>
+            <pre><div id="result_log" class="result_box"></div></pre>
+        </div>
+        
+        <div class="row">
+            <button id="button_reboot">Reboot Guest</button>
+            <pre><div id="result_reboot" class="result_box"></div></pre>
+            
+        </div>
+    </div>
+
+</body>
+</html>
