@@ -78,3 +78,25 @@ QEMU=/path/to/qemu-system-x86_64 scripts/launch_guest.sh --nocc --vsock 3
 The GUI shows an indicator for whether RC is connected to svsm and two buttons for the exposed services (view logs, reboot guest).
 
 ![Graphical Interface](assets/gui.webp)
+
+## Demo
+This demo illustrates the interaction between RC and SVSM, showing the four main components:
+
+- **socat** (bottom left)  
+- **SVSM**  (top left)  
+- **RC**    (top right)  
+- **GUI**   (bottom right)
+
+In this demo:
+- certificates are generated using `scritps/gen_certs.sh`
+- SVSM is compiled using `make FEATURES=tls,server` 
+- RC is launched with `cargo run`. 
+- Socat is started with the command `socat -d -d VSOCK-LISTEN:12345,reuseaddr,fork TCP:localhost:4433`
+- the GUI can be accessed through `http://localhost:3000/`.
+- SVSM itself is launched via QEMU using the script `QEMU=path/to/qemu-system-x86_64 scripts/launch_guest.sh --nocc --vsock 3`.
+
+During the demo, we can observe the Socat logs as SVSM and RC exchange messages. At the same time, the GUI displays the output of the API log buffer several times, allowing us to monitor the interactions visually.
+
+We also attempted to use the reboot API; however, this action fails because the demo is running in a native environment, and the reboot command requires sev-snp support. As a result, the client will see the following message `Reboot initiation failed`.
+
+https://github.com/user-attachments/assets/e30798f9-1b2e-42cf-9634-9af9698074d2
