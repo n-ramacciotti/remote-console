@@ -3,6 +3,7 @@ use http_body_util::Full;
 use hyper::body::Bytes;
 use hyper::client::conn::http1::SendRequest;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::Mutex;
 
 /// Application state managing the tls connection to SVSM
@@ -44,10 +45,28 @@ impl AppState {
             None => return Err(AppError::StateError("No sender available".to_string())),
         };
 
-        sender
-            .send_request(req)
-            .await
-            .map_err(|e| AppError::StateError(format!("Failed to send request: {e:?}")))
+        let Ok(result) =
+            tokio::time::timeout(Duration::from_secs(5), sender.send_request(req)).await
+        else {
+            *lock = None; // Clear the sender on timeout
+            println!("[RC] Timeout while sending request to SVSM");
+            return Err(AppError::StateError(
+                "Timeout while sending request".to_string(),
+            ));
+        };
+
+        match result {
+            Ok(response) => {
+                println!("[RC] Received response from SVSM: {:?}", response);
+                Ok(response)
+            }
+            Err(e) => {
+                println!("[RC] Error sending request to SVSM: {:?}", e);
+                Err(AppError::StateError(format!(
+                    "Failed to send request: {e:?}"
+                )))
+            }
+        }
     }
 
     /// Checks if the sender is set
