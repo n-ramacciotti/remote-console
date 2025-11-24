@@ -17,7 +17,7 @@ pub async fn run() -> Result<(), AppError> {
 
     let app = app(state)?;
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     let listener = tokio::net::TcpListener::bind(addr).await?;
 
     axum::serve(listener, app).await?;
